@@ -1,6 +1,13 @@
 import biuoop.DrawSurface;
 import biuoop.Sleeper;
 
+/************************************************************
+ * Matan Saloniko.
+ * ID: 318570769.
+ * email: matan.saloniko@gmail.com.
+ * username to the submit system: salonim.
+ * A class for the countdown before each level.
+ **********************************************************/
 public class CountdownAnimation implements Animation {
     private double numOfSeconds;
     private int countFrom;
@@ -28,7 +35,7 @@ public class CountdownAnimation implements Animation {
     public void doOneFrame(DrawSurface d) {
         Sleeper sleeper = new Sleeper();
         this.gameScreen.drawAllOn(d);
-        d.drawText(d.getWidth() / 3, d.getHeight() / 2, Integer.toString(this.timeLeft), 200);
+        d.drawText(d.getWidth() / 3 + 70, d.getHeight() / 2 + 100, Integer.toString(this.timeLeft), 200);
         this.timeLeft = this.timeLeft - 1;
         sleeper.sleepFor((long) ((this.numOfSeconds / this.countFrom) * 1000));
         /*
@@ -47,9 +54,6 @@ public class CountdownAnimation implements Animation {
      * @return - True if we should stop the animation false if we shouldn't.
      ************************************************************************/
     public boolean shouldStop() {
-        if (this.timeLeft < 0) {
-            return true;
-        }
-        return false;
+        return (this.timeLeft < 0);
     }
 }

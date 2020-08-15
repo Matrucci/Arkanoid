@@ -1,8 +1,12 @@
 import biuoop.DrawSurface;
 
-/***********************
+/********************************************
+ * Matan Saloniko.
+ * ID: 318570769.
+ * email: matan.saloniko@gmail.com.
+ * username to the submit system: salonim.
  * Animation interface.
- **********************/
+ *******************************************/
 public interface Animation {
     /******************************************
      * Doing one frame of the animation.

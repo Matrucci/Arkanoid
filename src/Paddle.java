@@ -12,6 +12,7 @@ import java.awt.Color;
 public class Paddle implements Sprite, Collidable {
     private biuoop.KeyboardSensor keyboard;
     private Rectangle paddleRec;
+    private int speed;
     private static final int XSTART = 350;
     private static final int YSTART = 560;
     private static final int WIDTH = 100;
@@ -33,7 +34,21 @@ public class Paddle implements Sprite, Collidable {
     public Paddle(Rectangle paddleRec, biuoop.KeyboardSensor keyboard) {
         this.paddleRec = paddleRec;
         this.keyboard = keyboard;
+        this.speed = UNITS;
     }
+
+    /****************************************************************
+     * A constructor.
+     * @param paddleRec - The rectangle that represents the paddle.
+     * @param keyboard - The keyboard sensor.
+     * @param speed - The speed the paddle needs to move.
+     ***************************************************************/
+    public Paddle(Rectangle paddleRec, biuoop.KeyboardSensor keyboard, int speed) {
+        this.paddleRec = paddleRec;
+        this.keyboard = keyboard;
+        this.speed = speed;
+    }
+
     /***************************************************************
      * A constructor.
      * @param keyboard - The keyboard sensor.
@@ -41,6 +56,19 @@ public class Paddle implements Sprite, Collidable {
     public Paddle(biuoop.KeyboardSensor keyboard) {
         this.paddleRec = new Rectangle(new Point(XSTART, YSTART), WIDTH, HEIGHT);
         this.keyboard = keyboard;
+        this.speed = UNITS;
+    }
+
+    /*******************************************
+     * A constructor.
+     * @param keyboard - The keyboard sensor.
+     * @param width - The paddle width.
+     * @param speed - The speed of the paddle.
+     ******************************************/
+    public Paddle(biuoop.KeyboardSensor keyboard, int width, int speed) {
+        this.paddleRec = new Rectangle(new Point(XSTART, YSTART), width, HEIGHT);
+        this.keyboard = keyboard;
+        this.speed = speed;
     }
 
     /***********************************************************************************
@@ -48,7 +76,7 @@ public class Paddle implements Sprite, Collidable {
      ***********************************************************************************/
     public void moveLeft() {
         if (this.paddleRec.getUpperLeft().getX() != BORDER_SIZE) {
-            this.paddleRec.getUpperLeft().setX(paddleRec.getUpperLeft().getX() - UNITS);
+            this.paddleRec.getUpperLeft().setX(paddleRec.getUpperLeft().getX() - this.speed);
         }
     }
 
@@ -58,7 +86,7 @@ public class Paddle implements Sprite, Collidable {
     public void moveRight() {
         double xMax = SCRREN_WIDTH - this.paddleRec.getWidth() - BORDER_SIZE;
         if (this.paddleRec.getUpperLeft().getX() != xMax) {
-            this.paddleRec.getUpperLeft().setX(paddleRec.getUpperLeft().getX() + UNITS);
+            this.paddleRec.getUpperLeft().setX(paddleRec.getUpperLeft().getX() + this.speed);
         }
     }
 
@@ -68,7 +96,9 @@ public class Paddle implements Sprite, Collidable {
      ***************************************************/
     @Override
     public void drawOn(DrawSurface d) {
-        d.setColor(Color.ORANGE);
+        //d.setColor(Color.ORANGE);
+        //d.setColor(new Color(255, 204, 0));
+        d.setColor(new Color(0, 0, 153));
         d.fillRectangle((int) this.paddleRec.getUpperLeft().getX(), (int) this.paddleRec.getUpperLeft().getY(),
                 (int) this.paddleRec.getWidth(), (int) this.paddleRec.getHeight());
     }

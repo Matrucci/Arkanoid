@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 /******************************************
  * Matan Saloniko.
  * ID: 318570769.
@@ -11,8 +14,23 @@ public class Ass5Game {
      * @param args - ignored.
      ***********************************/
     public static void main(String[] args) {
-        GameLevel gameLevel = new GameLevel();
+        List<LevelInformation> levels = new ArrayList<>();
+        AnimationRunner ar = new AnimationRunner();
+        GameFlow gf = new GameFlow(ar, ar.getGui().getKeyboardSensor());
+        //levels.add(new DirectHitLevel());
+        //levels.add(new WideEasyLevel());
+        //levels.add(new GreenLevel());
+        //levels.add(new FinalFourLevel());
+        gf.runLevels(levels);
+        /*
+        DirectHitLevel firstLevel = new DirectHitLevel();
+        WideEasyLevel secondLevel = new WideEasyLevel();
+        GreenLevel thirdLevel = new GreenLevel();
+        FinalFourLevel fourthLevel = new FinalFourLevel();
+        GameLevel gameLevel = new GameLevel(firstLevel);
         gameLevel.initialize();
         gameLevel.run();
+
+         */
     }
 }

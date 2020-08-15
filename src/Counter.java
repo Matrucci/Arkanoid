@@ -1,10 +1,10 @@
-/*******************
+/*******************************************
  * Matan Saloniko.
  * ID: 318570769.
  * email: matan.saloniko@gmail.com.
  * username to the submit system: salonim.
  * A counter class.
- ******************/
+ *****************************************/
 public class Counter {
     private int counter;
 

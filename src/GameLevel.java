@@ -11,6 +11,7 @@ import java.awt.Color;
  * A class that sets up the game and builds it.
  ***********************************************/
 public class GameLevel implements Animation {
+    private LevelInformation levelInfo;
     private SpriteCollection sprites;
     private GameEnvironment environment;
     private GUI gui;
@@ -24,6 +25,7 @@ public class GameLevel implements Animation {
     private AnimationRunner runner;
     private boolean running;
     private KeyboardSensor keyboard;
+    private LevelNameIndicator levelNameIndicator;
     //CONSTANTS
     private static final Color[] COLORS = {Color.GRAY, Color.RED, Color.cyan, Color.GREEN, Color.BLUE, Color.MAGENTA};
     private static final int START_POINT = 0;
@@ -51,6 +53,7 @@ public class GameLevel implements Animation {
      * A constructor.
      ***************/
     public GameLevel() {
+        this.levelInfo = null;
         this.sprites = new SpriteCollection();
         this.environment = new GameEnvironment();
         this.blockCounter = new Counter();
@@ -64,6 +67,58 @@ public class GameLevel implements Animation {
         this.running = true;
         this.runner = new AnimationRunner();
         this.keyboard = this.runner.getGui().getKeyboardSensor();
+    }
+
+    /********************************************
+     * A constructor.
+     * @param levelInfo - The level information.
+     *******************************************/
+    public GameLevel(LevelInformation levelInfo) {
+        this.levelInfo = levelInfo;
+        this.sprites = new SpriteCollection();
+        this.environment = new GameEnvironment();
+        this.blockCounter = new Counter();
+        this.blockCounter.increase(levelInfo.numberOfBlocksToRemove());
+        this.ballCounter = new Counter();
+        this.ballCounter.increase(levelInfo.numberOfBalls());
+        this.scoreCounter = new Counter();
+        this.blockRemover = new BlockRemover(this, blockCounter);
+        this.ballRemover = new BallRemover(this, ballCounter);
+        this.scoreTrackingListener = new ScoreTrackingListener(this.scoreCounter);
+        this.scoreIndicator = new ScoreIndicator(this.scoreCounter);
+        //this.gui = new GUI("Arkanoid", WIDTH, HEIGHT);
+        this.running = true;
+        this.runner = new AnimationRunner();
+        this.keyboard = this.runner.getGui().getKeyboardSensor();
+    }
+
+    /*************************************************************
+     * A constructor.
+     * @param levelInfo - The level information to run.
+     * @param keyboardSensor - The keyboard sensor.
+     * @param animationRunner - The animation runner.
+     * @param currentScore - The score from the previews levels.
+     *************************************************************/
+    public GameLevel(LevelInformation levelInfo, KeyboardSensor keyboardSensor,
+                     AnimationRunner animationRunner, int currentScore) {
+        this.levelInfo = levelInfo;
+        this.sprites = new SpriteCollection();
+        this.environment = new GameEnvironment();
+        this.blockCounter = new Counter();
+        this.blockCounter.increase(levelInfo.numberOfBlocksToRemove());
+        this.ballCounter = new Counter();
+        this.ballCounter.increase(levelInfo.numberOfBalls());
+        this.scoreCounter = new Counter();
+        this.scoreCounter.increase(currentScore);
+        this.blockRemover = new BlockRemover(this, blockCounter);
+        this.ballRemover = new BallRemover(this, ballCounter);
+        this.scoreTrackingListener = new ScoreTrackingListener(this.scoreCounter);
+        this.scoreIndicator = new ScoreIndicator(this.scoreCounter);
+        //this.gui = new GUI("Arkanoid", WIDTH, HEIGHT);
+        this.running = true;
+        this.runner = animationRunner;
+        this.keyboard = keyboardSensor;
+        this.levelNameIndicator = new LevelNameIndicator(this.levelInfo.levelName());
     }
 
     /************************************************
@@ -116,18 +171,10 @@ public class GameLevel implements Animation {
      * Create the blocks in the desired pattern.
      ********************************************/
     public void createBlocks() {
-        int xStart = WIDTH - (BLOCK_WIDTH * BLOCKS_IN_ROW) - BORDER_SIZE;
-        int yStart = HEIGHT / 5; //Starting from the first fifth of the screen.
-        for (int i = 0; i < ROWS; i++) {
-            for (int j = i; j < BLOCKS_IN_ROW; j++) {
-                Block b = new Block(new Rectangle(
-                        new Point(xStart + BLOCK_WIDTH * j, yStart + BLOCK_HEIGHT * i), BLOCK_WIDTH, BLOCK_HEIGHT),
-                        COLORS[i]);
-                b.addToGame(this);
-                b.addHitListener(this.blockRemover);
-                b.addHitListener(this.scoreTrackingListener);
-                this.blockCounter.increase(1);
-            }
+        for (Block b: this.levelInfo.blocks()) {
+            b.addToGame(this);
+            b.addHitListener(this.blockRemover);
+            b.addHitListener(this.scoreTrackingListener);
         }
     }
 
@@ -135,11 +182,10 @@ public class GameLevel implements Animation {
      * Creating and adding the balls to the game.
      ********************************************/
     public void createBalls() {
-        for (int i = 0; i < NUMBER_OFF_BALLS; i++) {
-            Ball ball = new Ball(BALL_XSTART, BALL_YSTART, BALL_SIZE, Color.WHITE, this.environment);
-            ball.setVelocity(DX + i, DY + i);
+        for (int i = 0; i < this.levelInfo.numberOfBalls(); i++) {
+            Ball ball = new Ball(400, 560 - BALL_SIZE, BALL_SIZE, new Color(51, 51, 51), this.environment);
+            ball.setVelocity(this.levelInfo.initialBallVelocities().get(i));
             ball.addToGame(this);
-            ballCounter.increase(1);
         }
     }
 
@@ -147,7 +193,10 @@ public class GameLevel implements Animation {
      * Creating the paddle.
      ***********************/
     public void createPaddle() {
-        Paddle paddle = new Paddle(this.runner.getGui().getKeyboardSensor());
+        Rectangle rec = new Rectangle(new Point(400 - ((double) this.levelInfo.paddleWidth()) / 2, 560),
+                this.levelInfo.paddleWidth(), 10);
+        //Paddle paddle = new Paddle(this.runner.getGui().getKeyboardSensor());
+        Paddle paddle  = new Paddle(rec, this.runner.getGui().getKeyboardSensor(), this.levelInfo.paddleSpeed());
         paddle.addToGame(this);
     }
 
@@ -162,6 +211,8 @@ public class GameLevel implements Animation {
      * Initialize a new game: create the Blocks and Ball and add them to the game.
      *****************************************************************************/
     public void initialize() {
+        //Adds the background first.
+        this.sprites.addSprite(this.levelInfo.getBackground());
         //Borders to the screen.
         createBorders();
         //Creates the blocks in the desired pattern and adds them to the game.
@@ -171,9 +222,32 @@ public class GameLevel implements Animation {
         //Creating the paddle.
         createPaddle();
         this.scoreIndicator.addToGame(this);
-
+        this.levelNameIndicator.addToGame(this);
     }
 
+    /**********************************
+     * Getter for the remaining balls.
+     * @return - The remaining balls.
+     ********************************/
+    public int getRemainingBalls() {
+        return this.ballCounter.getValue();
+    }
+
+    /**********************************
+     * Getter for the remaining blocks.
+     * @return - The remaining blocks.
+     ********************************/
+    public int getRemainingBlocks() {
+        return this.blockCounter.getValue();
+    }
+
+    /**********************************
+     * Getter for the score.
+     * @return - The score.
+     ********************************/
+    public int getScore() {
+        return this.scoreCounter.getValue();
+    }
 
     /******************************************
      * Doing one frame of the animation.
@@ -184,23 +258,26 @@ public class GameLevel implements Animation {
     public void doOneFrame(DrawSurface d) {
         d.setColor(Color.DARK_GRAY);
         d.fillRectangle(START_POINT, START_POINT, WIDTH, HEIGHT);
-        this.sprites.drawAllOn(d);
+
         //gui.show(d);
         //this.runner.getGui().show(d);
         if (this.blockCounter.getValue() == 0) {
             this.scoreCounter.increase(100);
-            this.runner.getGui().close();
-            //this.gui.close();
             this.running = false;
+            //this.runner.getGui().close();
         }
         if (this.ballCounter.getValue() == 0) {
-            //this.gui.close();
-            this.runner.getGui().close();
             this.running = false;
+            //this.runner.getGui().close();
         }
         this.sprites.notifyAllTimePassed();
+        this.sprites.drawAllOn(d);
+
+
         if (this.keyboard.isPressed("p") || this.keyboard.isPressed("פ") || this.keyboard.isPressed("P")) {
-            this.runner.run(new PauseScreen(this.keyboard));
+            this.runner.run(new KeyPressStoppableAnimation(this.keyboard, this.keyboard.SPACE_KEY,
+                    new PauseScreen(this.keyboard)));
+            //this.runner.run(new PauseScreen(this.keyboard));
         }
     }
 
@@ -216,7 +293,7 @@ public class GameLevel implements Animation {
      * Runs the game.
      ***************/
     public void run() {
-        this.runner.run(new CountdownAnimation(3, 3, this.sprites));
+        this.runner.run(new CountdownAnimation(2, 3, this.sprites));
         this.running = true;
         this.runner.run(this);
         /*

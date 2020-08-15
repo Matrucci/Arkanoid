@@ -7,9 +7,9 @@ import java.util.List;
  * ID: 318570769.
  * email: matan.saloniko@gmail.com.
  * username to the submit system: salonim.
- * A class for the first level (Direct Hit).
+ * The third level of the game (Green 3).
  **********************************************************/
-public class DirectHitLevel implements LevelInformation {
+public class GreenLevel implements LevelInformation {
     private int numberOfBalls;
     private List<Velocity> velList;
     private int paddleSpeed;
@@ -18,24 +18,37 @@ public class DirectHitLevel implements LevelInformation {
     private Sprite background;
     private List<Block> blocks;
     private int numberOfBlocksToRemove;
+    //CONTANTS
+    private static final Color[] COLORS = {Color.GRAY, Color.RED, Color.cyan,
+                                            Color.darkGray, Color.BLUE, Color.MAGENTA};
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 600;
+    private static final int BORDER_SIZE = 30;
+    private static final int BLOCK_HEIGHT = 25;
+    private static final int BLOCK_WIDTH = 45;
+    private static final int ROWS = 6;
+    private static final int BLOCKS_IN_ROW = 12;
 
-    /*****************
+    /****************
      * A constructor.
      ****************/
-    public DirectHitLevel() {
-        this.numberOfBalls = 1;
+    public GreenLevel() {
+        this.numberOfBalls = 2;
         this.velList = new ArrayList<>();
-        Velocity vel1 = new Velocity(0, -5);
-        this.velList.add(vel1);
-        this.paddleSpeed = 3;
+        for (int i = 0; i < this.numberOfBalls; i++) {
+            //Velocity vel = new Velocity(Math.pow(-1, i) * 3, 3);
+            Velocity vel = Velocity.fromAngleAndSpeed(330 + 60 * i, 5);
+            this.velList.add(vel);
+        }
+        this.paddleSpeed = 5;
         this.paddleWidth = 80;
-        this.levelName = "Direct Hit";
-        this.background = null;
+        this.levelName = "Green 3";
+        this.background = new Block(new Rectangle(new Point(0, 0), 800, 600),
+                new Color(102, 255, 102));
         this.blocks = new ArrayList<>();
-        Block onlyBlock = new Block(new Rectangle(new Point(390, 200), 20, 20), Color.RED);
-        this.blocks.add(onlyBlock);
-        this.numberOfBlocksToRemove = 1;
+        this.numberOfBlocksToRemove = 57;
     }
+
     /*********************************************
      * @return - The number of balls in the game.
      ********************************************/
@@ -82,8 +95,7 @@ public class DirectHitLevel implements LevelInformation {
      *************************************************************/
     @Override
     public Sprite getBackground() {
-        return new Block(new Rectangle(new Point(0, 0), 800, 600),
-                new Color(51, 153, 255));
+        return this.background;
     }
 
     /*****************************************************************************************
@@ -92,6 +104,16 @@ public class DirectHitLevel implements LevelInformation {
      ****************************************************************************************/
     @Override
     public List<Block> blocks() {
+        int xStart = WIDTH - (BLOCK_WIDTH * BLOCKS_IN_ROW) - BORDER_SIZE;
+        int yStart = HEIGHT / 5; //Starting from the first fifth of the screen.
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = i; j < BLOCKS_IN_ROW; j++) {
+                Block b = new Block(new Rectangle(
+                        new Point(xStart + BLOCK_WIDTH * j, yStart + BLOCK_HEIGHT * i), BLOCK_WIDTH, BLOCK_HEIGHT),
+                        COLORS[i]);
+                this.blocks.add(b);
+            }
+        }
         return this.blocks;
     }
 

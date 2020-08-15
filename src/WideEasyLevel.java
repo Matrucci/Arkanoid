@@ -7,9 +7,9 @@ import java.util.List;
  * ID: 318570769.
  * email: matan.saloniko@gmail.com.
  * username to the submit system: salonim.
- * A class for the first level (Direct Hit).
+ * A class for the second level (Wide Easy).
  **********************************************************/
-public class DirectHitLevel implements LevelInformation {
+public class WideEasyLevel implements LevelInformation {
     private int numberOfBalls;
     private List<Velocity> velList;
     private int paddleSpeed;
@@ -18,23 +18,38 @@ public class DirectHitLevel implements LevelInformation {
     private Sprite background;
     private List<Block> blocks;
     private int numberOfBlocksToRemove;
+    private static final Color[] COLORS = {Color.RED, Color.RED, Color.ORANGE, Color.ORANGE, Color.YELLOW, Color.YELLOW,
+                                            Color.GREEN, Color.GREEN, Color.GREEN, Color.GREEN, Color.BLUE, Color.BLUE,
+                                            Color.MAGENTA, Color.MAGENTA, Color.CYAN, Color.CYAN};
 
     /*****************
      * A constructor.
      ****************/
-    public DirectHitLevel() {
-        this.numberOfBalls = 1;
+    public WideEasyLevel() {
+        this.numberOfBalls = 10;
         this.velList = new ArrayList<>();
-        Velocity vel1 = new Velocity(0, -5);
-        this.velList.add(vel1);
-        this.paddleSpeed = 3;
-        this.paddleWidth = 80;
-        this.levelName = "Direct Hit";
-        this.background = null;
+        for (int i = 0; i < this.numberOfBalls; i++) {
+            //We want to balls to have different velocities where they will appear in a circle.
+            Velocity vel;
+            if (i >= 5) {
+                vel = Velocity.fromAngleAndSpeed(310 + (i + 1) * 10, 5);
+            } else {
+                vel = Velocity.fromAngleAndSpeed(310 + i * 10, 5);
+            }
+            this.velList.add(vel);
+        }
+        this.paddleSpeed = 5;
+        this.paddleWidth = 670;
+        this.levelName = "Wide Easy";
+        //Just a plain white background.
+        this.background = new Block(new Rectangle(new Point(0, 0), 800, 600), Color.WHITE);
         this.blocks = new ArrayList<>();
-        Block onlyBlock = new Block(new Rectangle(new Point(390, 200), 20, 20), Color.RED);
-        this.blocks.add(onlyBlock);
-        this.numberOfBlocksToRemove = 1;
+        this.numberOfBlocksToRemove = 16;
+        for (int i = 0; i < this.numberOfBlocksToRemove; i++) {
+            Rectangle rec = new Rectangle(new Point(30 + (46.25 * i), 270), 46.25, 15);
+            Block block = new Block(rec, COLORS[i]);
+            this.blocks.add(block);
+        }
     }
     /*********************************************
      * @return - The number of balls in the game.
@@ -82,8 +97,7 @@ public class DirectHitLevel implements LevelInformation {
      *************************************************************/
     @Override
     public Sprite getBackground() {
-        return new Block(new Rectangle(new Point(0, 0), 800, 600),
-                new Color(51, 153, 255));
+        return this.background;
     }
 
     /*****************************************************************************************

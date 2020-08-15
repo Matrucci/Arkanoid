@@ -1,24 +1,23 @@
 import biuoop.DrawSurface;
 import java.awt.Color;
 
-/*********************************************
+/************************************************
  * Matan Saloniko.
  * ID: 318570769.
  * email: matan.saloniko@gmail.com.
  * username to the submit system: salonim.
- * A class to display the score on the screen.
- ********************************************/
-public class ScoreIndicator implements Sprite {
-    private Counter score;
-    private static final int SCORE_SIZE = 15;
-    private static final int WINDOW_LENGTH = 800;
+ * A class that holds and writes the level name.
+ **********************************************/
+public class LevelNameIndicator implements Sprite {
+    private String name;
+    private static final int NAME_SIZE = 15;
 
     /*************************************
      * A constructor.
-     * @param score - The score counter.
+     * @param name - The score counter.
      ************************************/
-    public ScoreIndicator(Counter score) {
-        this.score = score;
+    public LevelNameIndicator(String name) {
+        this.name = name;
     }
 
     /*****************************************
@@ -28,10 +27,8 @@ public class ScoreIndicator implements Sprite {
      */
     @Override
     public void drawOn(DrawSurface d) {
-        d.setColor(Color.WHITE);
-        d.fillRectangle(0, 0, WINDOW_LENGTH, SCORE_SIZE);
         d.setColor(Color.BLACK);
-        d.drawText(375, SCORE_SIZE, "Score: " + this.score.getValue(), SCORE_SIZE);
+        d.drawText(600, NAME_SIZE, "Level name: " + this.name, NAME_SIZE);
     }
 
     /*********************************************************

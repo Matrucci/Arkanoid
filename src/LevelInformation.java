@@ -1,5 +1,12 @@
 import java.util.List;
 
+/************************************************************
+ * Matan Saloniko.
+ * ID: 318570769.
+ * email: matan.saloniko@gmail.com.
+ * username to the submit system: salonim.
+ * An interface for the level information.
+ **********************************************************/
 public interface LevelInformation {
     /*********************************************
      * @return - The number of balls in the game.
