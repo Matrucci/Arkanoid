@@ -1,5 +1,5 @@
 # Arkanoid
-Arkanoid Project for OOP
+Arkanoid Project for OOP class
 
 Run instructions:
   - Download all the files in the repository into the same folder.
